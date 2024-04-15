@@ -7,7 +7,7 @@ from models import build_model
 from sklearn.metrics import average_precision_score, confusion_matrix, accuracy_score
 
 
-def validate(model, loader, gpu_id):
+def validate(model, loader, gpu_id, tensorboard_writer):
     print("validating...")
     device = torch.device(f"cuda:{gpu_id[0]}" if torch.cuda.is_available() else "cpu")
     with torch.no_grad():
@@ -15,9 +15,9 @@ def validate(model, loader, gpu_id):
         for img, crops, label in loader:
             img_tens = img.to(device)
             crops_tens = [[t.to(device) for t in sublist] for sublist in crops]
-            features = model.get_features(img_tens).to(device)
+            features = model.model.get_features(img_tens).to(device)
 
-            y_pred.extend(model(crops_tens, features)[0].sigmoid().flatten().tolist())
+            y_pred.extend(model.model(crops_tens, features)[0].sigmoid().flatten().tolist())
             y_true.extend(label.flatten().tolist())
     y_true = np.array(y_true)
     y_pred = np.where(np.array(y_pred) >= 0.5, 1, 0)
@@ -29,6 +29,10 @@ def validate(model, loader, gpu_id):
     fnr = fn / (fn + tp)
     fpr = fp / (fp + tn)
     acc = accuracy_score(y_true, y_pred)
+    tensorboard_writer.add_scalar("Avg precision score", ap, model.total_steps)
+    tensorboard_writer.add_scalar("Avg acc score", acc, model.total_steps)
+    tensorboard_writer.add_scalar("Avg fpr", fpr, model.total_steps)
+    tensorboard_writer.add_scalar("Avg fnr", fnr, model.total_steps)
     return ap, fpr, fnr, acc
 
 

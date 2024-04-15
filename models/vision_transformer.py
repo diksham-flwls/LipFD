@@ -68,7 +68,7 @@ class EncoderBlock(nn.Module):
         attention_dropout: float,
         norm_layer: Callable[..., torch.nn.Module] = partial(nn.LayerNorm, eps=1e-6),
     ):
-        super().__init__()
+        super(EncoderBlock, self).__init__()
         self.num_heads = num_heads
 
         # Attention block
@@ -106,7 +106,7 @@ class Encoder(nn.Module):
         attention_dropout: float,
         norm_layer: Callable[..., torch.nn.Module] = partial(nn.LayerNorm, eps=1e-6),
     ):
-        super().__init__()
+        super(Encoder, self).__init__()
         # Note that batch_size is on the first dim because
         # we have batch_first=True in nn.MultiAttention() by default
         self.pos_embedding = nn.Parameter(torch.empty(1, seq_length, hidden_dim).normal_(std=0.02))  # from BERT
@@ -148,7 +148,7 @@ class VisionTransformer(nn.Module):
         norm_layer: Callable[..., torch.nn.Module] = partial(nn.LayerNorm, eps=1e-6),
         conv_stem_configs: Optional[List[ConvStemConfig]] = None,
     ):
-        super().__init__()
+        super(VisionTransformer, self).__init__()
         _log_api_usage_once(self)
         torch._assert(image_size % patch_size == 0, "Input shape indivisible by patch size!")
         self.image_size = image_size

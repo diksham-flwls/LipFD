@@ -6,6 +6,7 @@ from models import build_model, get_loss
 
 class Trainer(nn.Module):
     def __init__(self, opt):
+        super(Trainer, self).__init__()
         self.opt = opt
         self.total_steps = 0
         self.save_dir = os.path.join(opt.checkpoints_dir, opt.name)
@@ -14,7 +15,6 @@ class Trainer(nn.Module):
             if opt.gpu_ids
             else torch.device("cpu")
         )
-        self.opt = opt
         self.model = build_model(opt.arch)
 
         self.step_bias = (
@@ -34,7 +34,7 @@ class Trainer(nn.Module):
                 if name.split(".")[0] in ["encoder"]:
                     p.requires_grad = False
                 else:
-                    p.requires_grad = False
+                    p.requires_grad = True
             params = self.model.parameters()
 
         if opt.optim == "adam":
@@ -52,7 +52,8 @@ class Trainer(nn.Module):
             raise ValueError("optim should be [adam, sgd]")
 
         self.criterion = get_loss().to(self.device)
-        self.criterion1 = nn.CrossEntropyLoss()
+        # self.criterion1 = nn.CrossEntropyLoss()
+        self.criterion1 = nn.BCEWithLogitsLoss()
 
         self.model.to(opt.gpu_ids[0] if torch.cuda.is_available() else "cpu")
 
@@ -77,6 +78,7 @@ class Trainer(nn.Module):
         self.loss = self.criterion(
             self.weights_max, self.weights_org
         ) + self.criterion1(self.output, self.label)
+        # self.loss = self.criterion1(self.output, self.label)
 
     def get_loss(self):
         loss = self.loss.data.tolist()

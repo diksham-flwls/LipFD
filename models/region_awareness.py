@@ -228,11 +228,11 @@ class ResNet(nn.Module):
         # The comment resolution is based on input size is 224*224 imagenet
         # f.shape: (batch_size, 3, 224, 224), feature.shape: (batch_size, 768)
         features, weights, parts, weights_org, weights_max = [list() for i in range(5)]
-        for i in range(len(x[0])):
+        for i in range(len(x[0])):  # for each time step
             features.clear()
             weights.clear()
-            for j in range(len(x)):
-                f = x[i][j]
+            for j in range(len(x)): # for each crop
+                f = x[j][i]
                 f = self.conv1(f)
                 f = self.bn1(f)
                 f = self.relu(f)
@@ -245,18 +245,18 @@ class ResNet(nn.Module):
                 f = torch.flatten(f, 1)
 
                 # features.append(f)
-                features.append(torch.cat([f, feature], dim=2))  # concat regional feature with global feature
+                features.append(torch.cat([f, feature], dim=-1))  # concat regional feature with global feature
                 weights.append(self.get_weight(features[-1]))
 
-            features_stack = torch.stack(features, dim=2)
-            weights_stack = torch.stack(weights, dim=2)
-            weights_stack = softmax(weights_stack, dim=2)
+            features_stack = torch.stack(features, dim=2)       # 10 x 2816 x 3
+            weights_stack = torch.stack(weights, dim=2)         # 10 x 1 x 3
+            weights_stack = softmax(weights_stack, dim=2)       # 10 x 1 x 3
 
-            weights_max.append(weights_stack[:, :, :len(x)].max(dim=2)[0])
-            weights_org.append(weights_stack[:, :, 0])
-            parts.append(features_stack.mul(weights_stack).sum(2).div(weights_stack.sum(2)))
-        parts_stack = torch.stack(parts, dim=2)
-        out = parts_stack.sum(0).div(parts_stack.shape[0])
+            weights_max.append(weights_stack[:, :, :len(x)].max(dim=2)[0])  # 10 x 1
+            weights_org.append(weights_stack[:, :, 0])                      # 10 x 1
+            parts.append(features_stack.mul(weights_stack).sum(2).div(weights_stack.sum(2))) # 10 x 2816
+        parts_stack = torch.stack(parts, dim=2)                             # 10 x 2816 x 5
+        out = parts_stack.sum(-1).div(parts_stack.shape[-1])                # taking average across time dimension
 
         pred_score = self.fc(out)
 

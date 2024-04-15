@@ -14,8 +14,8 @@ class BaseOptions:
         parser.add_argument("--fix_backbone", default=False)
         parser.add_argument("--fix_encoder", default=True)
 
-        parser.add_argument("--real_list_path", default="./datasets/val/0_real")
-        parser.add_argument("--fake_list_path", default="./datasets/val/1_fake")
+        parser.add_argument("--real_list_path", default="./datasets/train/0_real")
+        parser.add_argument("--fake_list_path", default="./datasets/train/1_fake")
         parser.add_argument(
             "--data_label",
             default="train",
@@ -28,7 +28,7 @@ class BaseOptions:
         parser.add_argument(
             "--gpu_ids",
             type=str,
-            default="1",
+            default="0",
             help="gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU",
         )
         parser.add_argument(
@@ -50,6 +50,12 @@ class BaseOptions:
             "--serial_batches",
             action="store_true",
             help="if true, takes images in order to make batches, otherwise takes them randomly",
+        )
+        parser.add_argument(
+            "--suffix",
+            type=str,
+            default="",
+            help="Suffix for the checkpoints dir"
         )
         self.initialized = True
         return parser
@@ -111,16 +117,16 @@ class BaseOptions:
         if len(opt.gpu_ids) > 0:
             torch.cuda.set_device(opt.gpu_ids[0])
 
-        # additional
-        # opt.classes = opt.classes.split(',')
-        opt.rz_interp = opt.rz_interp.split(",")
-        opt.blur_sig = [float(s) for s in opt.blur_sig.split(",")]
-        opt.jpg_method = opt.jpg_method.split(",")
-        opt.jpg_qual = [int(s) for s in opt.jpg_qual.split(",")]
-        if len(opt.jpg_qual) == 2:
-            opt.jpg_qual = list(range(opt.jpg_qual[0], opt.jpg_qual[1] + 1))
-        elif len(opt.jpg_qual) > 2:
-            raise ValueError("Shouldn't have more than 2 values for --jpg_qual.")
+        # # additional
+        # # opt.classes = opt.classes.split(',')
+        # opt.rz_interp = opt.rz_interp.split(",")
+        # opt.blur_sig = [float(s) for s in opt.blur_sig.split(",")]
+        # opt.jpg_method = opt.jpg_method.split(",")
+        # opt.jpg_qual = [int(s) for s in opt.jpg_qual.split(",")]
+        # if len(opt.jpg_qual) == 2:
+        #     opt.jpg_qual = list(range(opt.jpg_qual[0], opt.jpg_qual[1] + 1))
+        # elif len(opt.jpg_qual) > 2:
+        #     raise ValueError("Shouldn't have more than 2 values for --jpg_qual.")
 
         self.opt = opt
         return self.opt

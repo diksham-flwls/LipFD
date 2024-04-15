@@ -11,7 +11,7 @@ class Bottleneck(nn.Module):
     expansion = 4
 
     def __init__(self, inplanes, planes, stride=1):
-        super().__init__()
+        super(Bottleneck, self).__init__()
 
         # all conv layers have stride 1. an avgpool is performed after the second convolution when stride > 1
         self.conv1 = nn.Conv2d(inplanes, planes, 1, bias=False)
@@ -57,7 +57,7 @@ class Bottleneck(nn.Module):
 
 class AttentionPool2d(nn.Module):
     def __init__(self, spacial_dim: int, embed_dim: int, num_heads: int, output_dim: int = None):
-        super().__init__()
+        super(AttentionPool2d, self).__init__()
         self.positional_embedding = nn.Parameter(torch.randn(spacial_dim ** 2 + 1, embed_dim) / embed_dim ** 0.5)
         self.k_proj = nn.Linear(embed_dim, embed_dim)
         self.q_proj = nn.Linear(embed_dim, embed_dim)
@@ -100,7 +100,7 @@ class ModifiedResNet(nn.Module):
     """
 
     def __init__(self, layers, output_dim, heads, input_resolution=224, width=64):
-        super().__init__()
+        super(ModifiedResNet, self).__init__()
         self.output_dim = output_dim
         self.input_resolution = input_resolution
 
@@ -170,7 +170,7 @@ class QuickGELU(nn.Module):
 
 class ResidualAttentionBlock(nn.Module):
     def __init__(self, d_model: int, n_head: int, attn_mask: torch.Tensor = None):
-        super().__init__()
+        super(ResidualAttentionBlock, self).__init__()
 
         self.attn = nn.MultiheadAttention(d_model, n_head)
         self.ln_1 = LayerNorm(d_model)
@@ -194,7 +194,7 @@ class ResidualAttentionBlock(nn.Module):
 
 class Transformer(nn.Module):
     def __init__(self, width: int, layers: int, heads: int, attn_mask: torch.Tensor = None):
-        super().__init__()
+        super(Transformer, self).__init__()
         self.width = width
         self.layers = layers
         self.resblocks = nn.Sequential(*[ResidualAttentionBlock(width, heads, attn_mask) for _ in range(layers)])
@@ -211,7 +211,7 @@ class Transformer(nn.Module):
 
 class VisionTransformer(nn.Module):
     def __init__(self, input_resolution: int, patch_size: int, width: int, layers: int, heads: int, output_dim: int):
-        super().__init__()
+        super(VisionTransformer, self).__init__()
         self.input_resolution = input_resolution
         self.output_dim = output_dim
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=width, kernel_size=patch_size, stride=patch_size, bias=False)
@@ -271,7 +271,7 @@ class CLIP(nn.Module):
                  transformer_heads: int,
                  transformer_layers: int
                  ):
-        super().__init__()
+        super(CLIP, self).__init__()
 
         self.context_length = context_length
 
