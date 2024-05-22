@@ -10,9 +10,13 @@ N_EXTRACT = 10  # number of extracted images from video
 WINDOW_LEN = 5  # frames of each window
 
 # xxx_root下需要有0_real和1_fake文件夹
-audio_root = "./AVLip/val/wav"
-video_root = "./AVLip/val"
-output_root = "./datasets/val"
+# audio_root = "./AVLip/val/wav"
+# video_root = "./AVLip/val"
+# output_root = "./datasets/val"
+# audio_root = "./AVLip/train/wav"
+# video_root = "./AVLip/train"
+dev_file_list = "./AVLip/dev_list.txt"
+output_root = "./datasets/train"
 
 labels = [(0, "0_real"), (1, "1_fake")]
 max_sample = 100
@@ -37,6 +41,7 @@ def run():
         video_list = os.listdir(root)
         print(f"Handling {dataset_name}...")
         for j in tqdm(range(len(video_list))):
+            video_name, audio_name, offset, num_frames = j
             v = video_list[j]
             # load video
             video_capture = cv2.VideoCapture(f"{root}/{v}")

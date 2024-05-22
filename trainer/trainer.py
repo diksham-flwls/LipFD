@@ -35,7 +35,7 @@ class Trainer(nn.Module):
                     p.requires_grad = False
                 else:
                     p.requires_grad = True
-            params = self.model.parameters()
+        params = self.model.parameters()
 
         if opt.optim == "adam":
             self.optimizer = torch.optim.AdamW(

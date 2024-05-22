@@ -16,6 +16,7 @@ def get_val_opt():
 
 
 if __name__ == "__main__":
+    breakpoint()
     opt = TrainOptions().parse()
     val_opt = get_val_opt()
     model = Trainer(opt)
